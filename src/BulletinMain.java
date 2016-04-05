@@ -1,8 +1,12 @@
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class BulletinMain {
+    static ArrayList<String> userList = new ArrayList<String>();
+    static ArrayList<Controller.Information> messageList = new ArrayList<Controller.Information>();
+    
     public static void main(String args[]) throws Exception {
         ServerSocket currSocket = new ServerSocket();
         
