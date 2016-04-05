@@ -3,7 +3,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
 
 public class Controller {
     public void Controller() {
@@ -11,8 +10,6 @@ public class Controller {
     }
     
     public class ThreadReader extends Thread {
-        ArrayList<String> userList = new ArrayList<String>();
-        ArrayList<Information> messageList = new ArrayList<Information>();
         
         private OutThread ot;
         private Socket Socket;
@@ -33,11 +30,20 @@ public class Controller {
                 this.ot.pw.println("Your current username is: "
                                    + this.ot.curUser);
             } else {
+                this.ot.pw.println("size" + BulletinMain.userList.size());
                 this.ot.pw
                 .println("Please enter the username you would like to use!");
-                this.ot.curUser = this.input.readLine();
-                this.ot.pw.println("Your current username is: "
-                                   + this.ot.curUser);
+                String potential = this.input.readLine();
+                if (BulletinMain.userList.contains(potential)) {
+                    this.ot.pw.println("The username " + potential
+                                       + " Already Exists!");
+                    this.ot.pw.println("Please try again!");
+                } else {
+                    this.ot.curUser = potential;
+                    this.ot.pw.println("Your current username is: "
+                                       + this.ot.curUser);
+                    BulletinMain.userList.add(this.ot.curUser);
+                }
             }
         }
         
@@ -226,7 +232,7 @@ public class Controller {
                 sb.append("Various commands will be used to chat.\n");
                 sb.append("Here is a list of commands.\n");
                 sb.append("You must enter username command first!\n");
-                sb.append("You will now create a username.\n");
+                sb.append("Type user to Begin!\n");
                 //this.ot.setCurrOut(sb.toString());
                 this.ot.pw.print(sb.toString());
                 while (true) {
