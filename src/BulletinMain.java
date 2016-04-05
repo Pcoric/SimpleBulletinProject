@@ -5,7 +5,9 @@ import java.util.ArrayList;
 
 public class BulletinMain {
     static ArrayList<String> userList = new ArrayList<String>();
+    static int MID = 0;
     static ArrayList<Controller.Information> messageList = new ArrayList<Controller.Information>();
+    static Controller.ThreadReader tr1;
     
     public static void main(String args[]) throws Exception {
         ServerSocket currSocket = new ServerSocket();
@@ -25,6 +27,7 @@ public class BulletinMain {
                 //begin thread
                 Controller controller = new Controller();
                 Controller.ThreadReader tr = controller.new ThreadReader(socket);
+                tr1 = controller.new ThreadReader(socket);
                 tr.start();
             }
         } catch (Exception e) {
