@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class Controller {
     public void Controller() {
@@ -10,19 +11,34 @@ public class Controller {
     }
     
     public class ThreadReader extends Thread {
+        ArrayList<String> userList = new ArrayList<String>();
+        ArrayList<Information> messageList = new ArrayList<Information>();
         
         private OutThread ot;
         private Socket Socket;
-        
+        private BufferedReader input;
         
         //boolean?
         
-        public ThreadReader(Socket socket) {
+        public ThreadReader(Socket socket) throws IOException {
             this.Socket = socket;
+            this.input = new BufferedReader(new InputStreamReader(
+                                                                  this.Socket.getInputStream()));
+            
         }
         
-        public String user(String[] arguments) {
-            return "";
+        public void user() throws IOException {
+            if (this.ot.curUser != "") {
+                this.ot.pw.println("Sorry your username can only be set once");
+                this.ot.pw.println("Your current username is: "
+                                   + this.ot.curUser);
+            } else {
+                this.ot.pw
+                .println("Please enter the username you would like to use!");
+                this.ot.curUser = this.input.readLine();
+                this.ot.pw.println("Your current username is: "
+                                   + this.ot.curUser);
+            }
         }
         
         /*
@@ -200,11 +216,10 @@ public class Controller {
         @Override
         public void run() {
             try {
-                BufferedReader input = new BufferedReader(
-                                                          new InputStreamReader(this.Socket.getInputStream()));
+                
                 //this.ot = new OutThread();
-                Users user = new Users();
-                this.ot = new OutThread(this.Socket, user); //fix
+                // Users user = new Users();
+                this.ot = new OutThread(this.Socket); //fix
                 StringBuilder sb = new StringBuilder();
                 
                 sb.append("Hello, you have entered a chat Message Board.\n");
@@ -216,7 +231,7 @@ public class Controller {
                 this.ot.pw.print(sb.toString());
                 while (true) {
                     
-                    this.ot.setCurrOut(this.getCommand(input.readLine())); //change to procesinput
+                    this.ot.setCurrOut(this.getCommand(this.input.readLine())); //change to procesinput
                 }
                 //this.Socket.close();
             } catch (Exception e) {
@@ -225,7 +240,7 @@ public class Controller {
             
         }
         
-        public String getCommand(String command) {
+        public String getCommand(String command) throws IOException {
             String end = "";
             
             switch (command) {
@@ -271,6 +286,7 @@ public class Controller {
                     break;
                     
                 case "user":
+                    this.user();
                     break;
                     
                 default:
@@ -286,11 +302,12 @@ public class Controller {
     
     public class OutThread extends Thread {
         private PrintWriter pw;
-        private Users Users;
+        String curUser = "";
+        String curGID = "";
+        String curGName = "";
         private String currOut = "empty";
         
-        public OutThread(Socket socket, Users user) {
-            this.Users = user;
+        public OutThread(Socket socket) {
             try {
                 this.pw = new PrintWriter(socket.getOutputStream(), true);
             } catch (IOException e) {
@@ -322,19 +339,58 @@ public class Controller {
         }
     }
     
-    public class Users {
-        String ID;
+    public class Information {
+        private String MID;
+        private String Subject;
+        private String User;
+        private String Date;
+        private String GName;
+        private String GID;
         
-        public void setUser(String id) {
-            this.ID = id;
-        }
-        
-        public void User() {
+        public Information(String subject, String user, String date,
+                           String mID, String gname, String gid) {
+            this.MID = mID;
+            this.Date = date;
+            this.Subject = subject;
+            this.User = user;
+            this.GID = gid;
+            this.GName = gname;
             
         }
         
-        public String getUserID() {
-            return this.ID;
+        public String getGID() {
+            return this.GID;
+        }
+        
+        public String getGName() {
+            return this.GName;
+        }
+        
+        public String getSubject() {
+            return this.Subject;
+        }
+        
+        public String getUser() {
+            return this.User;
+        }
+        
+        public String getDate() {
+            return this.Date;
+        }
+        
+        public String getMID() {
+            return this.MID;
         }
     }
+    
+    /*
+     * public class group { private String GName; private String GID;
+     *
+     * public group(String gName, String gID) { this.GName = gName; this.GID =
+     * gID; }
+     *
+     * public String nameGet() { return this.GName; }
+     *
+     * public String getID() { return this.GID; } } }
+     */
 }
